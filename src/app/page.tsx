@@ -9,6 +9,8 @@ import {
   Layers,
   Clock,
   Lock,
+  Terminal,
+  Zap,
 } from "lucide-react";
 
 export default function FerroxShowcase() {
@@ -56,7 +58,7 @@ export default function FerroxShowcase() {
           </p>
         </div>
 
-        {/* Premium Metrics "Card" Section (Centurion/Sapphire Style) */}
+        {/* Premium Metrics "Card" Section */}
         <div className="relative rounded-3xl bg-linear-to-b from-slate-900 to-black p-px mb-20 sm:mb-32 shadow-2xl shadow-blue-900/5">
           <div className="absolute inset-0 rounded-3xl bg-linear-to-br from-white/8 to-transparent pointer-events-none"></div>
 
@@ -68,7 +70,6 @@ export default function FerroxShowcase() {
                 <h2 className="text-xs sm:text-sm font-mono uppercase tracking-widest text-slate-500">
                   End-to-End Latency Profile
                 </h2>
-                {/* flex-wrap ensures badges don't overflow on small screens */}
                 <div className="flex flex-wrap gap-2 sm:gap-4">
                   <LatencyBadge label="P50" value="100ns" />
                   <LatencyBadge label="P90" value="200ns" />
@@ -77,7 +78,6 @@ export default function FerroxShowcase() {
                 </div>
               </div>
 
-              {/* Grid adjusts from 1 col (mobile) to 2 cols (tablet) to 4 cols (desktop) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8 border-t border-white/5 pt-10 md:pt-12">
                 <Metric
                   icon={<Activity size={24} className="text-slate-200" />}
@@ -107,6 +107,12 @@ export default function FerroxShowcase() {
             </div>
           </div>
         </div>
+
+        {/* LMAX-Inspired Data Flow Diagram */}
+        <SystemDiagram />
+
+        {/* The Phase Timeline */}
+        <PhaseTimeline />
 
         {/* Architecture Grid */}
         <div className="mb-20 sm:mb-32">
@@ -153,11 +159,211 @@ export default function FerroxShowcase() {
             </span>
           </div>
           <p className="text-[10px] sm:text-xs text-slate-600 font-mono text-center md:text-left">
-            © {new Date().getFullYear()} Anh Tran. Engineered in Rust.
+            &copy; {new Date().getFullYear()} Anh Tran. Engineered in Rust.
           </p>
         </div>
       </footer>
     </div>
+  );
+}
+
+function PhaseTimeline() {
+  const phases = [
+    {
+      phase: "Phase 1",
+      title: "Domain Model & Correctness",
+      description:
+        "Established the baseline logic with HashMap and VecDeque. Fixed-point i64 prices were implemented on day one to prevent IEEE 754 floating-point rounding errors.",
+      metric: "Proptest Baseline",
+    },
+    {
+      phase: "Phase 2",
+      title: "Zero Hot-Path Allocations",
+      description:
+        "Replaced collections with a 1M-slot Arena object pool and custom intrusive doubly linked lists. Eliminated all OS malloc contention.",
+      metric: "-58% Cancel Latency",
+    },
+    {
+      phase: "Phase 3",
+      title: "Sorted Price Levels",
+      description:
+        "Swapped HashMaps for BTreeMaps. Best-price recomputation went from an O(n) linear scan to an O(log n) tree lookup upon level exhaustion.",
+      metric: "-67% Sweep Latency",
+    },
+    {
+      phase: "Phase 4",
+      title: "Lock-Free Concurrency",
+      description:
+        "Implemented a Disruptor-style SPSC ring buffer for inter-thread communication. Engineered with CachePadded atomics and Acquire/Release memory ordering.",
+      metric: "8.8x Throughput",
+    },
+    {
+      phase: "Phase 5",
+      title: "Binary Protocol & Multicast",
+      description:
+        "Dropped JSON overhead for custom fixed-size little-endian structs. Integrated TCP ingestion and UDP multicast execution report broadcasting.",
+      metric: "Zero-copy codecs",
+    },
+    {
+      phase: "Phase 6",
+      title: "Deterministic Recovery",
+      description:
+        "Added a memory-mapped Write-Ahead Log (WAL) and bincode snapshots. Ensures bit-exact state recovery in under 1.4 milliseconds after a crash.",
+      metric: "56ns WAL append",
+    },
+    {
+      phase: "Phase 7",
+      title: "Observability & Proof",
+      description:
+        "Eliminated the final Vec<Fill> allocation via borrowed slices. Verified architecture limits using HdrHistogram and a custom load generator.",
+      metric: "500ns P99 / 4.7M Ops",
+    },
+  ];
+
+  return (
+    <div className="mb-20 sm:mb-32">
+      <div className="flex items-center gap-3 mb-10 sm:mb-16">
+        <Terminal className="text-blue-500" size={28} />
+        <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          Path to Sub-Microsecond
+        </h2>
+      </div>
+
+      <div className="relative border-l border-white/10 ml-4 sm:ml-6 space-y-12 pb-4">
+        {/* Glowing timeline track */}
+        <div className="absolute top-0 bottom-0 -left-px w-[2px] bg-linear-to-b from-blue-500 via-purple-500 to-transparent opacity-50"></div>
+
+        {phases.map((item, index) => (
+          <div key={index} className="relative pl-8 sm:pl-12 group">
+            {/* Timeline Node */}
+            <div className="absolute -left-2 top-1.5 w-4 h-4 rounded-full bg-black border-2 border-white/20 group-hover:border-blue-400 group-hover:scale-125 transition-all duration-300 z-10 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 rounded-full bg-white/40 group-hover:bg-blue-400 group-hover:shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all"></div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-2">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-blue-400">
+                  {item.phase}
+                </span>
+                <span className="text-lg sm:text-xl font-semibold text-white tracking-tight">
+                  {item.title}
+                </span>
+              </div>
+              <div className="inline-flex self-start sm:self-auto items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/5 text-[10px] sm:text-xs font-mono text-emerald-400 whitespace-nowrap">
+                <Zap size={12} className="text-emerald-500" /> {item.metric}
+              </div>
+            </div>
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed font-light max-w-3xl">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SystemDiagram() {
+  return (
+    <div className="mb-20 sm:mb-32">
+      <h2 className="text-2xl sm:text-3xl font-bold text-white mb-10 sm:mb-16 tracking-tight">
+        LMAX-Inspired Data Flow
+      </h2>
+
+      <div className="relative p-5 sm:p-10 rounded-3xl bg-white/2 border border-white/5 overflow-hidden">
+        {/* Subtle background glow for the diagram */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] sm:w-3/4 h-[150%] sm:h-3/4 bg-blue-500/5 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none"></div>
+
+        <div className="relative flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8">
+          {/* Thread 1: Ingestion */}
+          <div className="flex-1 w-full bg-black/40 border border-white/10 rounded-2xl p-5 sm:p-6 backdrop-blur-sm relative group hover:border-blue-500/30 transition-colors mt-4 lg:mt-0">
+            <div className="absolute -top-3 left-4 sm:left-6 bg-blue-900 text-blue-100 text-[9px] sm:text-[10px] font-mono px-2.5 sm:px-3 py-1 rounded-full border border-blue-500/30 tracking-widest uppercase">
+              Thread 1: Ingestion
+            </div>
+            <div className="flex flex-col items-center gap-3 sm:gap-4 mt-3 sm:mt-4">
+              <div className="w-full p-3 rounded-xl bg-white/5 border border-white/5 text-center text-xs sm:text-sm font-medium text-slate-300">
+                TCP Network Rx
+              </div>
+              <ArrowDown />
+              <div className="w-full p-3 rounded-xl bg-white/5 border border-white/5 text-center text-xs sm:text-sm font-medium text-slate-300">
+                Binary Decoder
+              </div>
+            </div>
+          </div>
+
+          {/* The Bridge: Ring Buffer */}
+          <div className="flex flex-col items-center shrink-0">
+            {/* Desktop Horizontal Line */}
+            <div className="hidden lg:block w-10 xl:w-16 h-px bg-linear-to-r from-blue-500/50 to-emerald-500/50"></div>
+            {/* Mobile Vertical Line */}
+            <div className="h-6 sm:h-8 w-px lg:hidden bg-linear-to-b from-blue-500/50 to-emerald-500/50"></div>
+
+            <div className="p-3 sm:p-4 rounded-xl bg-linear-to-br from-slate-800 to-black border border-white/10 shadow-[0_0_20px_rgba(59,130,246,0.15)] sm:shadow-[0_0_30px_rgba(59,130,246,0.1)] text-center my-2 sm:my-4 lg:my-0 z-10 w-full sm:w-auto">
+              <div className="text-sm sm:text-base text-white font-bold tracking-tight mb-0.5 sm:mb-1">
+                SPSC Ring Buffer
+              </div>
+              <div className="text-[9px] sm:text-[10px] text-slate-400 font-mono">
+                Atomic Acquire/Release
+              </div>
+            </div>
+
+            {/* Desktop Horizontal Line */}
+            <div className="hidden lg:block w-10 xl:w-16 h-px bg-linear-to-r from-emerald-500/50 to-purple-500/50"></div>
+            {/* Mobile Vertical Line */}
+            <div className="h-6 sm:h-8 w-px lg:hidden bg-linear-to-b from-emerald-500/50 to-purple-500/50"></div>
+          </div>
+
+          {/* Thread 2: Matching */}
+          <div className="flex-1 w-full bg-black/40 border border-white/10 rounded-2xl p-5 sm:p-6 backdrop-blur-sm relative group hover:border-purple-500/30 transition-colors mb-2 lg:mb-0">
+            <div className="absolute -top-3 right-4 sm:right-6 bg-purple-900 text-purple-100 text-[9px] sm:text-[10px] font-mono px-2.5 sm:px-3 py-1 rounded-full border border-purple-500/30 tracking-widest uppercase">
+              Thread 2: Matching
+            </div>
+            <div className="flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4">
+              <div className="w-full p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+                <div className="text-xs sm:text-sm font-bold text-white mb-0.5 sm:mb-1">
+                  Matching Engine
+                </div>
+                <div className="text-[9px] sm:text-[10px] text-slate-400 font-mono">
+                  BTreeMap & 1M-slot Arena
+                </div>
+              </div>
+
+              {/* FIXED: Changed to flex-col on mobile, flex-row on SM and up to prevent text wrapping/squishing */}
+              <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
+                <div className="flex-1 p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/5 text-center flex flex-col items-center justify-center">
+                  <span className="text-[11px] sm:text-xs font-medium text-slate-300">
+                    mmap WAL
+                  </span>
+                </div>
+                <div className="flex-1 p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/5 text-center flex flex-col items-center justify-center">
+                  <span className="text-[11px] sm:text-xs font-medium text-slate-300">
+                    UDP Multicast
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArrowDown() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="text-slate-600"
+    >
+      <path d="M12 5v14M19 12l-7 7-7-7" />
+    </svg>
   );
 }
 
