@@ -117,7 +117,7 @@ export default function FerroxShowcase() {
         {/* The Phase Timeline */}
         <PhaseTimeline />
 
-        {/* Architecture Grid */}
+        {/* Systems Engineering */}
         <div className="mb-20 sm:mb-32">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-10 sm:mb-16 tracking-tight">
             Systems Engineering
@@ -149,66 +149,82 @@ export default function FerroxShowcase() {
               description="Structs are meticulously padded to 64 bytes (#[repr(C, align(64))]) to occupy exactly one x86 cache line. This actively prevents false sharing and CPU cache invalidation during multi-threaded ring buffer access."
             />
           </div>
-        </div>
 
-        {/* Benchmark Evidence */}
-        <BenchmarkEvidence />
-
-        {/* Engineered Resilience */}
-        <div className="mb-20 sm:mb-32">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-10 sm:mb-16 tracking-tight">
-            Engineered Resilience
-          </h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-            <ArchitectureCard
-              icon={
-                <RotateCcw size={24} className="text-blue-400 sm:w-7 sm:h-7" />
-              }
-              title="Deterministic Recovery"
-              description="Load the latest snapshot, replay the WAL, resume. Recovery completes in under 1.4 milliseconds with bit-exact state reconstruction. No approximation, no reconciliation — the recovered book is identical to pre-crash state."
-            />
-            <ArchitectureCard
-              icon={
-                <ShieldCheck
-                  size={24}
-                  className="text-slate-300 sm:w-7 sm:h-7"
-                />
-              }
-              title="Data Integrity"
-              description="Every WAL record carries a CRC32 checksum. Corrupted records from power loss or disk faults are detected on replay and cleanly truncated to the last valid entry. At most one in-flight order is lost."
-            />
-            <ArchitectureCard
-              icon={
-                <Gauge size={24} className="text-slate-300 sm:w-7 sm:h-7" />
-              }
-              title="Graceful Back-Pressure"
-              description="When the matching engine falls behind ingestion rate, the 65,536-slot ring buffer absorbs burst traffic. Inbound orders are delayed via TCP flow control, never dropped. Zero data loss under sustained load."
-            />
+          {/* Resilience — borderless, under the same heading */}
+          <div className="border-t border-white/5 mt-10 sm:mt-14 pt-10 sm:pt-14">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 sm:gap-12">
+              <div>
+                <div className="mb-4 sm:mb-5 p-3 sm:p-4 rounded-full bg-black/50 inline-block border border-white/5">
+                  <RotateCcw
+                    size={24}
+                    className="text-blue-400 sm:w-7 sm:h-7"
+                  />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3 tracking-tight">
+                  Deterministic Recovery
+                </h3>
+                <p className="text-slate-400 leading-relaxed font-light text-xs sm:text-sm">
+                  Load the latest snapshot, replay the WAL, resume. Recovery
+                  completes in under 1.4 milliseconds with bit-exact state
+                  reconstruction. The recovered book is identical to pre-crash
+                  state.
+                </p>
+              </div>
+              <div>
+                <div className="mb-4 sm:mb-5 p-3 sm:p-4 rounded-full bg-black/50 inline-block border border-white/5">
+                  <ShieldCheck
+                    size={24}
+                    className="text-slate-300 sm:w-7 sm:h-7"
+                  />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3 tracking-tight">
+                  Data Integrity
+                </h3>
+                <p className="text-slate-400 leading-relaxed font-light text-xs sm:text-sm">
+                  Every WAL record carries a CRC32 checksum. Corrupted records
+                  from power loss or disk faults are detected on replay and
+                  cleanly truncated to the last valid entry.
+                </p>
+              </div>
+              <div>
+                <div className="mb-4 sm:mb-5 p-3 sm:p-4 rounded-full bg-black/50 inline-block border border-white/5">
+                  <Gauge size={24} className="text-slate-300 sm:w-7 sm:h-7" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3 tracking-tight">
+                  Graceful Back-Pressure
+                </h3>
+                <p className="text-slate-400 leading-relaxed font-light text-xs sm:text-sm">
+                  When the matching engine falls behind ingestion rate, the
+                  65,536-slot ring buffer absorbs burst traffic. Inbound orders
+                  are delayed via TCP flow control, never dropped.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Engineering Standards */}
-        <div className="mb-20 sm:mb-32">
-          <div className="rounded-2xl border border-white/5 bg-white/2 p-6 sm:p-10">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              <StandardMetric value="137" label="Tests Passing" />
-              <StandardMetric
-                value="6"
-                label="Unsafe Blocks"
-                detail="Each with documented safety invariants"
-              />
-              <StandardMetric
-                value="Zero"
-                label="External Dependencies"
-                detail="On the matching hot path"
-              />
-              <StandardMetric
-                value="Bit-Exact"
-                label="Deterministic Replay"
-                detail="Same input always produces same state"
-              />
-            </div>
+        {/* Benchmark Evidence — ruled list */}
+        <BenchmarkEvidence />
+
+        {/* Engineering Standards — borderless */}
+        <div className="mb-20 sm:mb-32 border-t border-white/5 pt-16 sm:pt-20">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
+            <StandardMetric value="137" label="Tests Passing" />
+            <StandardMetric
+              value="6"
+              label="Unsafe Blocks"
+              detail="Each with documented safety invariants"
+            />
+            <StandardMetric
+              value="Zero"
+              label="External Dependencies"
+              detail="On the matching hot path"
+            />
+            <StandardMetric
+              value="Bit-Exact"
+              label="Deterministic Replay"
+              detail="Same input always produces same state"
+            />
           </div>
         </div>
       </main>
@@ -516,25 +532,29 @@ function BenchmarkEvidence() {
         Proven Under Pressure
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+      <div className="divide-y divide-white/5">
         {benchmarks.map((b) => (
           <div
             key={b.title}
-            className="group p-6 sm:p-8 rounded-2xl bg-white/2 border border-white/5 hover:bg-white/4 hover:border-white/10 transition-all duration-300"
+            className="py-6 sm:py-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-8"
           >
-            <div className="text-3xl sm:text-4xl font-bold text-emerald-400 mb-3 sm:mb-4 tracking-tight">
-              {b.change}
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold text-white tracking-tight mb-0.5">
+                {b.title}
+              </h3>
+              <p className="text-slate-500 text-xs sm:text-sm font-light">
+                {b.context}
+              </p>
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-1 tracking-tight">
-              {b.title}
-            </h3>
-            <p className="text-slate-500 text-xs sm:text-sm font-light mb-5">
-              {b.context}
-            </p>
-            <div className="flex items-center gap-3 text-xs sm:text-sm font-mono">
-              <span className="text-slate-500">{b.before}</span>
-              <ArrowRight size={14} className="text-slate-600" />
-              <span className="text-white font-medium">{b.after}</span>
+            <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+              <div className="flex items-center gap-2.5 text-xs sm:text-sm font-mono">
+                <span className="text-slate-500">{b.before}</span>
+                <ArrowRight size={14} className="text-slate-600" />
+                <span className="text-slate-300">{b.after}</span>
+              </div>
+              <span className="text-xl sm:text-2xl font-bold text-emerald-400 tracking-tight min-w-[4ch] text-right">
+                {b.change}
+              </span>
             </div>
           </div>
         ))}
