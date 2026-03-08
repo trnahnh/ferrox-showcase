@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ferrox-engine.vercel.app"),
   title: "Ferrox Engine | High-Frequency Order Matching",
   description:
     "A low-latency order matching engine in Rust. 500ns P99 latency, 4.7M orders/sec, zero heap allocation on the hot path.",
@@ -29,6 +30,13 @@ export const metadata: Metadata = {
     description:
       "Sub-microsecond determinism. 500ns P99 latency and 4.7M orders/sec.",
     type: "website",
+    url: "https://ferrox-engine.vercel.app",
+  },
+  twitter: {
+    card: "summary",
+    title: "Ferrox Engine | High-Frequency Order Matching",
+    description:
+      "Sub-microsecond determinism. 500ns P99 latency and 4.7M orders/sec.",
   },
 };
 

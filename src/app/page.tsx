@@ -1,4 +1,4 @@
-import React from "react";
+import type { ReactNode } from "react";
 import {
   Shield,
   Database,
@@ -11,6 +11,9 @@ import {
   Lock,
   Terminal,
   Zap,
+  RotateCcw,
+  ShieldCheck,
+  Gauge,
 } from "lucide-react";
 
 export default function FerroxShowcase() {
@@ -31,7 +34,7 @@ export default function FerroxShowcase() {
         <a
           href="https://github.com/trnahnh/ferrox"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2"
         >
           View Source <ArrowRight size={16} />
@@ -47,7 +50,7 @@ export default function FerroxShowcase() {
               Phase 7 Benchmarks Live
             </span>
           </div>
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-b from-white to-slate-500 mb-6 sm:mb-8 leading-[1.1]">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-b from-white to-slate-500 mb-6 sm:mb-8 leading-[1.1]">
             Uncompromising Speed. <br className="hidden sm:block" />
             Absolute Determinism.
           </h1>
@@ -147,6 +150,67 @@ export default function FerroxShowcase() {
             />
           </div>
         </div>
+
+        {/* Benchmark Evidence */}
+        <BenchmarkEvidence />
+
+        {/* Engineered Resilience */}
+        <div className="mb-20 sm:mb-32">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-10 sm:mb-16 tracking-tight">
+            Engineered Resilience
+          </h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            <ArchitectureCard
+              icon={
+                <RotateCcw size={24} className="text-blue-400 sm:w-7 sm:h-7" />
+              }
+              title="Deterministic Recovery"
+              description="Load the latest snapshot, replay the WAL, resume. Recovery completes in under 1.4 milliseconds with bit-exact state reconstruction. No approximation, no reconciliation — the recovered book is identical to pre-crash state."
+            />
+            <ArchitectureCard
+              icon={
+                <ShieldCheck
+                  size={24}
+                  className="text-slate-300 sm:w-7 sm:h-7"
+                />
+              }
+              title="Data Integrity"
+              description="Every WAL record carries a CRC32 checksum. Corrupted records from power loss or disk faults are detected on replay and cleanly truncated to the last valid entry. At most one in-flight order is lost."
+            />
+            <ArchitectureCard
+              icon={
+                <Gauge size={24} className="text-slate-300 sm:w-7 sm:h-7" />
+              }
+              title="Graceful Back-Pressure"
+              description="When the matching engine falls behind ingestion rate, the 65,536-slot ring buffer absorbs burst traffic. Inbound orders are delayed via TCP flow control, never dropped. Zero data loss under sustained load."
+            />
+          </div>
+        </div>
+
+        {/* Engineering Standards */}
+        <div className="mb-20 sm:mb-32">
+          <div className="rounded-2xl border border-white/5 bg-white/2 p-6 sm:p-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <StandardMetric value="137" label="Tests Passing" />
+              <StandardMetric
+                value="6"
+                label="Unsafe Blocks"
+                detail="Each with documented safety invariants"
+              />
+              <StandardMetric
+                value="Zero"
+                label="External Dependencies"
+                detail="On the matching hot path"
+              />
+              <StandardMetric
+                value="Bit-Exact"
+                label="Deterministic Replay"
+                detail="Same input always produces same state"
+              />
+            </div>
+          </div>
+        </div>
       </main>
 
       {/* Footer */}
@@ -158,9 +222,17 @@ export default function FerroxShowcase() {
               Ferrox
             </span>
           </div>
-          <p className="text-[10px] sm:text-xs text-slate-600 font-mono text-center md:text-left">
-            &copy; {new Date().getFullYear()} Anh Tran. Engineered in Rust.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+            <a
+              href="mailto:anhdtran.forwork@gmail.com"
+              className="text-[10px] sm:text-xs text-slate-500 hover:text-white transition-colors font-mono"
+            >
+              anhdtran.forwork@gmail.com
+            </a>
+            <p className="text-[10px] sm:text-xs text-slate-600 font-mono text-center md:text-left">
+              &copy; {new Date().getFullYear()} Anh Tran. Engineered in Rust.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
@@ -233,8 +305,8 @@ function PhaseTimeline() {
         {/* Glowing timeline track */}
         <div className="absolute top-0 bottom-0 -left-px w-[2px] bg-linear-to-b from-blue-500 via-purple-500 to-transparent opacity-50"></div>
 
-        {phases.map((item, index) => (
-          <div key={index} className="relative pl-8 sm:pl-12 group">
+        {phases.map((item) => (
+          <div key={item.phase} className="relative pl-8 sm:pl-12 group">
             {/* Timeline Node */}
             <div className="absolute -left-2 top-1.5 w-4 h-4 rounded-full bg-black border-2 border-white/20 group-hover:border-blue-400 group-hover:scale-125 transition-all duration-300 z-10 flex items-center justify-center">
               <div className="w-1.5 h-1.5 rounded-full bg-white/40 group-hover:bg-blue-400 group-hover:shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all"></div>
@@ -361,6 +433,7 @@ function ArrowDown() {
       strokeLinecap="round"
       strokeLinejoin="round"
       className="text-slate-600"
+      aria-hidden="true"
     >
       <path d="M12 5v14M19 12l-7 7-7-7" />
     </svg>
@@ -384,7 +457,7 @@ function Metric({
   label,
   subtext,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   value: string;
   label: string;
   subtext: string;
@@ -405,12 +478,103 @@ function Metric({
   );
 }
 
+function BenchmarkEvidence() {
+  const benchmarks = [
+    {
+      change: "-58%",
+      title: "Order Cancellation",
+      context: "Middle of 1,000 resting orders",
+      before: "2.16 µs",
+      after: "0.91 µs",
+    },
+    {
+      change: "-67%",
+      title: "Multi-Level Price Sweep",
+      context: "100 ask levels exhausted sequentially",
+      before: "45.14 µs",
+      after: "14.73 µs",
+    },
+    {
+      change: "-82%",
+      title: "Worst-Case Cancel",
+      context: "1,000 orders across 1,000 distinct prices",
+      before: "696.94 µs",
+      after: "124.07 µs",
+    },
+    {
+      change: "8.8x",
+      title: "Cross-Thread Throughput",
+      context: "SPSC ring buffer vs std::sync::mpsc",
+      before: "16.35 ms",
+      after: "1.85 ms",
+    },
+  ];
+
+  return (
+    <div className="mb-20 sm:mb-32">
+      <h2 className="text-2xl sm:text-3xl font-bold text-white mb-10 sm:mb-16 tracking-tight">
+        Proven Under Pressure
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        {benchmarks.map((b) => (
+          <div
+            key={b.title}
+            className="group p-6 sm:p-8 rounded-2xl bg-white/2 border border-white/5 hover:bg-white/4 hover:border-white/10 transition-all duration-300"
+          >
+            <div className="text-3xl sm:text-4xl font-bold text-emerald-400 mb-3 sm:mb-4 tracking-tight">
+              {b.change}
+            </div>
+            <h3 className="text-lg sm:text-xl font-semibold text-white mb-1 tracking-tight">
+              {b.title}
+            </h3>
+            <p className="text-slate-500 text-xs sm:text-sm font-light mb-5">
+              {b.context}
+            </p>
+            <div className="flex items-center gap-3 text-xs sm:text-sm font-mono">
+              <span className="text-slate-500">{b.before}</span>
+              <ArrowRight size={14} className="text-slate-600" />
+              <span className="text-white font-medium">{b.after}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StandardMetric({
+  value,
+  label,
+  detail,
+}: {
+  value: string;
+  label: string;
+  detail?: string;
+}) {
+  return (
+    <div className="text-center sm:text-left">
+      <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-1">
+        {value}
+      </div>
+      <div className="text-xs sm:text-sm font-medium text-slate-300 mb-0.5">
+        {label}
+      </div>
+      {detail && (
+        <div className="text-[10px] sm:text-xs text-slate-500 font-light">
+          {detail}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ArchitectureCard({
   icon,
   title,
   description,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   description: string;
 }) {
