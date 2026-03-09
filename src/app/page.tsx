@@ -76,8 +76,8 @@ export default function FerroxShowcase() {
                     End-to-End Latency Profile
                   </h2>
                   <p className="text-[10px] sm:text-xs text-slate-600 font-mono mt-1">
-                    Local benchmarks via HdrHistogram &middot; custom load
-                    generator &middot; single-threaded core
+                    Windows 11 &middot; Rust 2024 &middot; criterion 0.8.2
+                    &middot; HdrHistogram &middot; release profile
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:gap-4">
@@ -85,6 +85,8 @@ export default function FerroxShowcase() {
                   <LatencyBadge label="P90" value="200ns" />
                   <LatencyBadge label="P99" value="500ns" />
                   <LatencyBadge label="P99.9" value="800ns" />
+                  <LatencyBadge label="Mean" value="151ns" />
+                  <LatencyBadge label="Max" value="~38µs" />
                 </div>
               </div>
 
@@ -114,6 +116,11 @@ export default function FerroxShowcase() {
                   subtext="10K record deterministic replay"
                 />
               </div>
+
+              <p className="text-[10px] sm:text-xs text-slate-600 font-mono mt-8 sm:mt-10 pt-6 border-t border-white/5">
+                Cross-validated via criterion: 34&ndash;64 ns/order across
+                1K&ndash;100K crossing and mixed workloads
+              </p>
             </div>
           </div>
         </div>
@@ -232,6 +239,50 @@ export default function FerroxShowcase() {
               label="Deterministic Replay"
               detail="Same input always produces same state"
             />
+          </div>
+        </div>
+        {/* Production Horizon */}
+        <div className="mb-20 sm:mb-32">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 tracking-tight">
+            Production Horizon
+          </h2>
+          <p className="text-slate-500 text-sm sm:text-base font-light mb-10 sm:mb-14 max-w-2xl">
+            Deliberately out of scope for this project &mdash; but engineered
+            with these production realities in mind.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 sm:gap-x-12 gap-y-6 sm:gap-y-8">
+            {[
+              {
+                term: "DPDK / AF_XDP",
+                desc: "Kernel bypass networking for true wire-to-wire latency elimination",
+              },
+              {
+                term: "Multi-Instrument Routing",
+                desc: "Gateway distributing orders to per-instrument engine instances",
+              },
+              {
+                term: "Aeron Transport",
+                desc: "Reliable UDP multicast with built-in flow control and backpressure",
+              },
+              {
+                term: "FIX Protocol Gateway",
+                desc: "Industry-standard order entry interface for external client connectivity",
+              },
+              {
+                term: "Hot-Hot Failover",
+                desc: "Secondary engine replaying the same WAL for zero-downtime recovery",
+              },
+            ].map((item) => (
+              <div key={item.term}>
+                <h3 className="text-sm sm:text-base font-semibold text-white tracking-tight mb-1">
+                  {item.term}
+                </h3>
+                <p className="text-slate-500 text-xs sm:text-sm font-light leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </main>
