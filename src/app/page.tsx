@@ -56,8 +56,9 @@ export default function FerroxShowcase() {
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-slate-400 font-light leading-relaxed max-w-2xl">
             A high-frequency order matching engine engineered in Rust. Utilizing
-            an LMAX-inspired single-threaded core for sub-microsecond latency
-            and 4.7M orders/sec throughput.
+            an LMAX-inspired single-threaded core, benchmarked at
+            sub-microsecond latency and 4.7M simulated orders/sec on a single
+            machine.
           </p>
         </div>
 
@@ -70,9 +71,15 @@ export default function FerroxShowcase() {
 
             <div className="p-6 sm:p-10 md:p-16">
               <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 md:mb-12 gap-6">
-                <h2 className="text-xs sm:text-sm font-mono uppercase tracking-widest text-slate-500">
-                  End-to-End Latency Profile
-                </h2>
+                <div>
+                  <h2 className="text-xs sm:text-sm font-mono uppercase tracking-widest text-slate-500">
+                    End-to-End Latency Profile
+                  </h2>
+                  <p className="text-[10px] sm:text-xs text-slate-600 font-mono mt-1">
+                    Local benchmarks via HdrHistogram &middot; custom load
+                    generator &middot; single-threaded core
+                  </p>
+                </div>
                 <div className="flex flex-wrap gap-2 sm:gap-4">
                   <LatencyBadge label="P50" value="100ns" />
                   <LatencyBadge label="P90" value="200ns" />
@@ -86,7 +93,7 @@ export default function FerroxShowcase() {
                   icon={<Activity size={24} className="text-slate-200" />}
                   value="4.7M"
                   label="Orders / Second"
-                  subtext="Single-threaded capacity"
+                  subtext="Single-threaded, local benchmark"
                 />
                 <Metric
                   icon={<Layers size={24} className="text-slate-200" />}
