@@ -79,7 +79,7 @@ export default function FerroxShowcase() {
             <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-blue-500/30 to-transparent"></div>
 
             <div className="p-6 sm:p-10 md:p-16">
-              <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 md:mb-12 gap-6">
+              <div className="flex flex-col items-start mb-10 md:mb-12 gap-6">
                 <div>
                   <h2 className="text-xs sm:text-sm font-mono uppercase tracking-widest text-slate-500">
                     End-to-End Latency Profile
@@ -90,7 +90,7 @@ export default function FerroxShowcase() {
                     2026-10-10
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-2 sm:gap-4">
+                <div className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 w-full xl:flex xl:flex-wrap xl:gap-4">
                   <LatencyBadge label="P50" value="130–210ns" />
                   <LatencyBadge label="P90" value="321–481ns" />
                   <LatencyBadge label="P99" value="0.83–1.06µs" />
@@ -638,8 +638,8 @@ function Verification() {
             <p className="text-slate-400 leading-relaxed font-light text-xs sm:text-sm mb-4 sm:mb-6 grow">
               {c.description}
             </p>
-            <div className="inline-flex self-start items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/5 text-[10px] sm:text-xs font-mono text-emerald-400">
-              <Zap size={12} className="text-emerald-500" /> {c.tag}
+            <div className="inline-flex self-start max-w-full items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/5 text-[10px] sm:text-xs font-mono text-emerald-400 leading-snug">
+              <Zap size={12} className="text-emerald-500 shrink-0" /> {c.tag}
             </div>
           </div>
         ))}
@@ -700,7 +700,7 @@ function ArrowDown() {
 
 function LatencyBadge({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2 bg-white/3 border border-white/8 rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 shrink-0">
+    <div className="flex items-center justify-between xl:justify-start gap-1.5 sm:gap-2 bg-white/3 border border-white/8 rounded-lg px-2.5 sm:px-3 py-1.5 shrink-0">
       <span className="text-[10px] sm:text-xs font-medium text-slate-500">
         {label}
       </span>
