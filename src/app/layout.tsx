@@ -16,19 +16,23 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://ferrox-engine.vercel.app"),
   title: "Ferrox Engine | High-Frequency Order Matching",
   description:
-    "A low-latency order matching engine in Rust. 500ns P99 latency, 4.7M orders/sec, zero heap allocation on the hot path.",
+    "A low-latency order matching engine in Rust. Sub-microsecond P99 (0.83–1.06 µs, TSC-timed), 4.4M orders/sec, zero heap allocation on the hot path. Model-checked, fault-injected, sanitized and fuzzed.",
   keywords: [
     "Rust",
     "Matching Engine",
     "HFT",
     "Low Latency",
     "Systems Engineering",
+    "Lock-Free",
+    "Memory Model",
+    "Fault Injection",
+    "Verification",
   ],
   authors: [{ name: "Anh Tran" }],
   openGraph: {
     title: "Ferrox Engine | High-Frequency Order Matching",
     description:
-      "Sub-microsecond determinism. 500ns P99 latency and 4.7M orders/sec.",
+      "Sub-microsecond determinism. P99 0.83–1.06 µs and 4.4M orders/sec, verified under loom, Miri, TSan and fault injection.",
     type: "website",
     url: "https://ferrox-engine.vercel.app",
   },
@@ -36,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Ferrox Engine | High-Frequency Order Matching",
     description:
-      "Sub-microsecond determinism. 500ns P99 latency and 4.7M orders/sec.",
+      "Sub-microsecond determinism. P99 0.83–1.06 µs and 4.4M orders/sec, verified under loom, Miri, TSan and fault injection.",
   },
 };
 

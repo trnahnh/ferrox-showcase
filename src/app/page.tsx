@@ -14,6 +14,12 @@ import {
   RotateCcw,
   ShieldCheck,
   Gauge,
+  FlaskConical,
+  Bug,
+  Microscope,
+  Crosshair,
+  Dices,
+  GitCompareArrows,
 } from "lucide-react";
 
 export default function FerroxShowcase() {
@@ -47,7 +53,7 @@ export default function FerroxShowcase() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/3 border border-white/5 mb-6 sm:mb-8">
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
             <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-slate-400">
-              Phase 7 Benchmarks Live
+              Phase 9 &middot; Verified &amp; Re-measured
             </span>
           </div>
           <h1 className="text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-b from-white to-slate-500 mb-6 sm:mb-8 leading-[1.1]">
@@ -55,10 +61,13 @@ export default function FerroxShowcase() {
             Absolute Determinism.
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-slate-400 font-light leading-relaxed max-w-2xl">
-            A high-frequency order matching engine engineered in Rust. Utilizing
-            an LMAX-inspired single-threaded core, benchmarked at
-            sub-microsecond latency and 4.7M simulated orders/sec on a single
-            machine.
+            A high-frequency order matching engine engineered in Rust. An
+            LMAX-inspired single-threaded core measured at sub-microsecond
+            per-order latency and 4.4M orders/sec on a single machine. Every
+            number comes from a command you can rerun: the ring buffer is
+            model-checked under the C11 memory model, the persistence layer is
+            fault-injected at every byte offset, and the core is ported to C++
+            for a like-for-like comparison.
           </p>
         </div>
 
@@ -76,32 +85,32 @@ export default function FerroxShowcase() {
                     End-to-End Latency Profile
                   </h2>
                   <p className="text-[10px] sm:text-xs text-slate-600 font-mono mt-1">
-                    Windows 11 &middot; Rust 2024 &middot; criterion 0.8.2
-                    &middot; HdrHistogram &middot; release profile
+                    Ryzen 7 7735HS &middot; Windows 11 &middot; rustc 1.93.1
+                    &middot; TSC clock, 0.3 ns step &middot; 3 runs &middot;
+                    2026-10-10
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:gap-4">
-                  <LatencyBadge label="P50" value="100ns" />
-                  <LatencyBadge label="P90" value="200ns" />
-                  <LatencyBadge label="P99" value="500ns" />
-                  <LatencyBadge label="P99.9" value="800ns" />
-                  <LatencyBadge label="Mean" value="151ns" />
-                  <LatencyBadge label="Max" value="~38µs" />
+                  <LatencyBadge label="P50" value="130–210ns" />
+                  <LatencyBadge label="P90" value="321–481ns" />
+                  <LatencyBadge label="P99" value="0.83–1.06µs" />
+                  <LatencyBadge label="P99.9" value="1.4–1.7µs" />
+                  <LatencyBadge label="Mean" value="171–257ns" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8 border-t border-white/5 pt-10 md:pt-12">
                 <Metric
                   icon={<Activity size={24} className="text-slate-200" />}
-                  value="4.7M"
+                  value="4.4M"
                   label="Orders / Second"
-                  subtext="Single-threaded, local benchmark"
+                  subtext="4.36–4.41M without timing overhead"
                 />
                 <Metric
                   icon={<Layers size={24} className="text-slate-200" />}
                   value="Zero"
                   label="Heap Allocations"
-                  subtext="Via borrowed &[Fill] slices"
+                  subtext="Orders & fills; only BTreeMap level nodes allocate"
                 />
                 <Metric
                   icon={<GitCommit size={24} className="text-slate-200" />}
@@ -117,9 +126,13 @@ export default function FerroxShowcase() {
                 />
               </div>
 
-              <p className="text-[10px] sm:text-xs text-slate-600 font-mono mt-8 sm:mt-10 pt-6 border-t border-white/5">
-                Cross-validated via criterion: 34&ndash;64 ns/order across
-                1K&ndash;100K crossing and mixed workloads
+              <p className="text-[10px] sm:text-xs text-slate-600 font-mono mt-8 sm:mt-10 pt-6 border-t border-white/5 leading-relaxed">
+                Ring pop &rarr; match &rarr; encode execution report, per order
+                over 990,000 orders (63% fill, 37% rest). The earlier published
+                100/200/500/800 ns percentiles were quantized by the 100 ns step
+                of std::time::Instant on Windows; the load generator now times
+                with the x86-64 timestamp counter and prints the clock step it
+                observed.
               </p>
             </div>
           </div>
@@ -141,7 +154,7 @@ export default function FerroxShowcase() {
             <ArchitectureCard
               icon={<Cpu size={24} className="text-blue-400 sm:w-7 sm:h-7" />}
               title="Lock-Free SPSC Pipeline"
-              description="A Disruptor-style ring buffer bridges ingestion to matching. Engineered with atomic Acquire/Release memory ordering and CachePadded structures, delivering an 8.8x throughput increase over standard mpsc channels."
+              description="A Disruptor-style ring buffer bridges ingestion to matching. Acquire/Release cursors compile to plain MOV instructions, verified from the generated assembly; SeqCst costs 5.4x on the same transfer. 3.2x faster than std::sync::mpsc on 8-byte payloads, and 10–17% faster than its own C++20 port on 48-byte orders (p ≤ 0.003, n = 40, pinned cores)."
             />
             <ArchitectureCard
               icon={
@@ -160,7 +173,7 @@ export default function FerroxShowcase() {
             <ArchitectureCard
               icon={<Lock size={24} className="text-blue-400 sm:w-7 sm:h-7" />}
               title="Cache-Line Optimization"
-              description="Structs are meticulously padded to 64 bytes (#[repr(C, align(64))]) to occupy exactly one x86 cache line. This actively prevents false sharing and CPU cache invalidation during multi-threaded ring buffer access."
+              description="Structs are padded to 64 bytes (#[repr(C, align(64))]) to occupy exactly one x86 cache line. The cost of getting this wrong was measured, not assumed: removing the padding doubles cross-thread transfer time through false sharing alone, without changing a line of logic."
             />
           </div>
 
@@ -180,8 +193,8 @@ export default function FerroxShowcase() {
                 <p className="text-slate-400 leading-relaxed font-light text-xs sm:text-sm">
                   Load the latest snapshot, replay the WAL, resume. Recovery
                   completes in under 1.4 milliseconds with bit-exact state
-                  reconstruction. The recovered book is identical to pre-crash
-                  state.
+                  reconstruction. After every injected fault and process kill,
+                  the recovered book equals a fresh replay of the same input.
                 </p>
               </div>
               <div>
@@ -195,9 +208,11 @@ export default function FerroxShowcase() {
                   Data Integrity
                 </h3>
                 <p className="text-slate-400 leading-relaxed font-light text-xs sm:text-sm">
-                  Every WAL record carries a CRC32 checksum. Corrupted records
-                  from power loss or disk faults are detected on replay and
-                  cleanly truncated to the last valid entry.
+                  Every WAL record carries a CRC32 checksum, and the snapshot
+                  checksum covers every field. Corrupt or torn records are
+                  truncated to the longest valid prefix, and the bytes beyond
+                  it are zeroed so discarded history can never resurface after
+                  new appends.
                 </p>
               </div>
               <div>
@@ -217,17 +232,24 @@ export default function FerroxShowcase() {
           </div>
         </div>
 
+        {/* Verification */}
+        <Verification />
+
         {/* Benchmark Evidence — ruled list */}
         <BenchmarkEvidence />
 
         {/* Engineering Standards — borderless */}
         <div className="mb-20 sm:mb-32 border-t border-white/5 pt-16 sm:pt-20">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
-            <StandardMetric value="137" label="Tests Passing" />
             <StandardMetric
-              value="6"
+              value="148"
+              label="Tests Passing"
+              detail="Plus 4 loom model checks, 6 C++ tests, 3 fuzz targets"
+            />
+            <StandardMetric
+              value="11"
               label="Unsafe Blocks"
-              detail="Each with documented safety invariants"
+              detail="Plus 4 unsafe impl; each with a documented invariant, checked by Miri and TSan"
             />
             <StandardMetric
               value="Zero"
@@ -272,6 +294,10 @@ export default function FerroxShowcase() {
               {
                 term: "Hot-Hot Failover",
                 desc: "Secondary engine replaying the same WAL for zero-downtime recovery",
+              },
+              {
+                term: "Power-Loss Durability",
+                desc: "fsync/msync ordering for the WAL and snapshots; the fault-injection harness covers process crashes only",
               },
             ].map((item) => (
               <div key={item.term}>
@@ -341,7 +367,7 @@ function PhaseTimeline() {
       title: "Lock-Free Concurrency",
       description:
         "Implemented a Disruptor-style SPSC ring buffer for inter-thread communication. Engineered with CachePadded atomics and Acquire/Release memory ordering.",
-      metric: "8.8x Throughput",
+      metric: "3.2x vs std mpsc",
     },
     {
       phase: "Phase 5",
@@ -361,8 +387,22 @@ function PhaseTimeline() {
       phase: "Phase 7",
       title: "Observability & Proof",
       description:
-        "Eliminated the final Vec<Fill> allocation via borrowed slices. Verified architecture limits using HdrHistogram and a custom load generator.",
-      metric: "500ns P99 / 4.7M Ops",
+        "Eliminated the final Vec<Fill> allocation via borrowed slices. Verified architecture limits using HdrHistogram and a load generator that times each order with the TSC and prints its own clock resolution.",
+      metric: "P99 0.83–1.06µs / 4.4M Ops",
+    },
+    {
+      phase: "Phase 8",
+      title: "Verify It",
+      description:
+        "Model-checked the ring under the C11 memory model with loom, added differential property tests against a naive oracle, ported the ring to C++20 for a like-for-like benchmark, and measured what SeqCst, false sharing, cursor caching and bounds checks each cost.",
+      metric: "loom: 4 pass, Relaxed caught",
+    },
+    {
+      phase: "Phase 9",
+      title: "Break It",
+      description:
+        "Fault-injected the WAL and snapshots at every byte offset and killed the writer mid-write, finding two silent-corruption defects. Root-caused the single-thread Rust-vs-C++ gap in LLVM IR, settled the cross-thread comparison with pinned, interleaved statistics, and ran Miri, TSan, ASan, UBSan and libFuzzer in CI.",
+      metric: "2 defects found & fixed",
     },
   ];
 
@@ -449,7 +489,7 @@ function SystemDiagram() {
                 SPSC Ring Buffer
               </div>
               <div className="text-[9px] sm:text-[10px] text-slate-400 font-mono">
-                Atomic Acquire/Release
+                Acquire/Release &middot; loom-checked
               </div>
             </div>
 
@@ -474,7 +514,6 @@ function SystemDiagram() {
                 </div>
               </div>
 
-              {/* FIXED: Changed to flex-col on mobile, flex-row on SM and up to prevent text wrapping/squishing */}
               <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
                 <div className="flex-1 p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/5 text-center flex flex-col items-center justify-center">
                   <span className="text-[11px] sm:text-xs font-medium text-slate-300">
@@ -489,6 +528,151 @@ function SystemDiagram() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Verification() {
+  const checks = [
+    {
+      icon: <FlaskConical size={24} className="text-blue-400 sm:w-7 sm:h-7" />,
+      title: "Model Checking",
+      description:
+        "The ring compiles against loom, which explores every interleaving the C11 memory model allows. FIFO across wraparound and backpressure and exactly-once drop pass. Downgrading the cursors to Relaxed is caught immediately: Causality violation.",
+      tag: "4 pass · negative control caught",
+    },
+    {
+      icon: <Dices size={24} className="text-slate-300 sm:w-7 sm:h-7" />,
+      title: "Differential Testing",
+      description:
+        "Random add/cancel sequences run through the engine and a flat-Vec reference book. Status, fills, cancels, best prices and full book contents must agree after every step, and replaying the same input must produce the same transcript.",
+      tag: "512 cases per property · 0 disagreements",
+    },
+    {
+      icon: <Bug size={24} className="text-blue-400 sm:w-7 sm:h-7" />,
+      title: "Crash-Consistency Fault Injection",
+      description:
+        "The WAL and snapshot files are truncated and corrupted at every byte offset with three patterns, then written to again and recovered again. A writer process is killed mid-write for 12 cycles. This found two silent-corruption defects, both fixed.",
+      tag: "3,362 faults · 12 kills · 2 defects fixed",
+    },
+    {
+      icon: <Microscope size={24} className="text-slate-300 sm:w-7 sm:h-7" />,
+      title: "Sanitizers & Miri",
+      description:
+        "ThreadSanitizer, ASan and UBSan on the C++ ring; Miri with strict provenance and a sanitizer-instrumented std on the Rust ring, in CI. Both Relaxed negative controls are caught on the exact access the acquire/release pair orders.",
+      tag: "TSan · ASan · UBSan · Miri",
+    },
+    {
+      icon: <Crosshair size={24} className="text-blue-400 sm:w-7 sm:h-7" />,
+      title: "Coverage-Guided Fuzzing",
+      description:
+        "libFuzzer targets for the wire decoder, the WAL loader and the snapshot loader. First CI run found a CRC-valid record that does not decode; the engine now refuses to start rather than guess, and the input is committed as a seed and a unit test.",
+      tag: "3 targets · 1 finding · seed committed",
+    },
+    {
+      icon: (
+        <GitCompareArrows
+          size={24}
+          className="text-slate-300 sm:w-7 sm:h-7"
+        />
+      ),
+      title: "C++ Port & Statistics",
+      description:
+        "A line-for-line C++20 port of the ring with the same compile-time knobs. Pinned cores, interleaved ABBA runs, bootstrap confidence intervals and Mann-Whitney tests. Rust is 10–17% faster on 48-byte transfer; C++ is 1.35x faster single-threaded, mostly the bounds check safe Rust cannot elide.",
+      tag: "n = 40 · p ≤ 0.003",
+    },
+  ];
+
+  const corrections = [
+    {
+      claim: "P99 latency",
+      before: "500 ns",
+      after: "0.83–1.06 µs",
+      why: "The 100 ns step of std::time::Instant on Windows quantized every percentile. Re-timed with the TSC.",
+    },
+    {
+      claim: "Ring vs std::sync::mpsc",
+      before: "8.8x",
+      after: "3.2x",
+      why: "The original gap came from an unpreserved session and never reproduced. The number shown is the one that does.",
+    },
+    {
+      claim: "Unsafe inventory",
+      before: "6 blocks",
+      after: "11 blocks + 4 impl",
+      why: "A recount found blocks in the tracking allocator and ring internals that the README had left out.",
+    },
+    {
+      claim: "Rust vs C++ cross-thread",
+      before: "Tie within noise",
+      after: "Rust 10–17% faster",
+      why: "Two unpinned runs could not resolve the effect. Forty pinned, interleaved runs do, at p ≤ 0.003.",
+    },
+  ];
+
+  return (
+    <div className="mb-20 sm:mb-32">
+      <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 tracking-tight">
+        Verified, Not Asserted
+      </h2>
+      <p className="text-slate-500 text-sm sm:text-base font-light mb-10 sm:mb-14 max-w-2xl">
+        Benchmarks say the engine is fast. Phases 8 and 9 ask whether it is
+        right, what each design decision is worth, and which of the earlier
+        claims survive re-measurement.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {checks.map((c) => (
+          <div
+            key={c.title}
+            className="group p-6 sm:p-8 rounded-2xl bg-white/2 border border-white/5 hover:bg-white/4 hover:border-white/10 transition-all duration-300 flex flex-col"
+          >
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-full bg-black/50 inline-block self-start border border-white/5 group-hover:scale-110 transition-transform duration-300">
+              {c.icon}
+            </div>
+            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3 tracking-tight">
+              {c.title}
+            </h3>
+            <p className="text-slate-400 leading-relaxed font-light text-xs sm:text-sm mb-4 sm:mb-6 grow">
+              {c.description}
+            </p>
+            <div className="inline-flex self-start items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/5 text-[10px] sm:text-xs font-mono text-emerald-400">
+              <Zap size={12} className="text-emerald-500" /> {c.tag}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Corrections — what re-measurement changed */}
+      <div className="border-t border-white/5 mt-10 sm:mt-14 pt-10 sm:pt-14">
+        <h3 className="text-xs sm:text-sm font-mono uppercase tracking-widest text-slate-500 mb-6 sm:mb-8">
+          What re-measurement changed
+        </h3>
+        <div className="divide-y divide-white/5">
+          {corrections.map((c) => (
+            <div
+              key={c.claim}
+              className="py-5 sm:py-6 flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-8"
+            >
+              <div className="sm:max-w-xl">
+                <h4 className="text-sm sm:text-base font-semibold text-white tracking-tight mb-0.5">
+                  {c.claim}
+                </h4>
+                <p className="text-slate-500 text-xs sm:text-sm font-light">
+                  {c.why}
+                </p>
+              </div>
+              <div className="flex items-center gap-2.5 text-xs sm:text-sm font-mono shrink-0">
+                <span className="text-slate-500 line-through decoration-slate-700">
+                  {c.before}
+                </span>
+                <ArrowRight size={14} className="text-slate-600" />
+                <span className="text-slate-200">{c.after}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -576,11 +760,34 @@ function BenchmarkEvidence() {
       after: "124.07 µs",
     },
     {
-      change: "8.8x",
+      change: "3.2x",
       title: "Cross-Thread Throughput",
-      context: "SPSC ring buffer vs std::sync::mpsc",
-      before: "16.35 ms",
-      after: "1.85 ms",
+      context: "SPSC ring vs best std::sync::mpsc, 1M u64, 2026-10-10",
+      before: "9.73 ms",
+      after: "3.06 ms",
+    },
+    {
+      change: "-42%",
+      title: "Single-Thread Push+Pop",
+      context:
+        "ManuallyDrop<Arc> lets LLVM keep cursors in registers · n = 40, p = 1.4e-14",
+      before: "2.752 ns",
+      after: "1.610 ns",
+    },
+    {
+      change: "5.4x",
+      title: "Acquire/Release vs SeqCst",
+      context: "Cost of over-synchronizing · 1M u64 cross-thread, median of 30",
+      before: "23.65 ms",
+      after: "4.42 ms",
+    },
+    {
+      change: "2.1x",
+      title: "Cache-Line Padding",
+      context:
+        "Cost of false sharing · same transfer, cursors on one line vs padded",
+      before: "9.09 ms",
+      after: "4.42 ms",
     },
   ];
 
